@@ -11,9 +11,8 @@ fn main() {
 		let mut input = String::new();
 	   
 		helper::print("~$ ");
-	   
-		io::stdin().read_line(&mut input)
-			.expect("Failed to read input");
+		
+		helper::get_input(&mut input);
 			
 		if input.trim() == "exit" {
 			break;
@@ -33,10 +32,16 @@ fn main() {
 			println!("Invalid command.\n");
 			continue;
 		}
-			
-		let command = input_tokens[1];
-		let arg = input_tokens[2];
 		
-		println!("End");
+		let command = input_tokens[1];
+		let mut arg;
+		
+		if input_tokens.len() == 2 {
+			arg = "";
+		} else {
+			arg = input_tokens[2];
+		}
+		
+		cli::command_router::route_command(input_tokens);
     }
 }
