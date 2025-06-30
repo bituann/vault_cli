@@ -3,10 +3,10 @@ use crate::utils::enums;
 
 pub fn route_command (command: &str, arg: &str) -> enums::Outcome {
 	match command {
-		"upload" => commands::upload(arg),
-		"list" => commands::list(),
-		"read" => commands::read(arg),
-		"delete" => commands::delete(arg),
+		"upload" => commands::upload::upload(arg),
+		"list" => commands::list::list(),
+		"read" => commands::read::read(arg),
+		"delete" => commands::delete::delete(arg),
 		_ => enums::Outcome::Fail("Invalid command"),
 	}
 }
