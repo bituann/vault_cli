@@ -1,5 +1,5 @@
 use std::io;
-use utils::helper;
+use utils::*;
 
 mod cli;
 mod services;
@@ -18,28 +18,23 @@ fn main() {
 			break;
 		}
 			
-		let input_tokens: Vec<&str> = input.trim()
-			.split(" ").collect();
-			
-		let prefix = input_tokens[0];
+		let valid_cmd = helper::check_command(&input);
 		
-		if prefix != "vault" {
-			println!("Start all commands with 'vault'\n");
-			continue;
+		match valid_cmd {
+			//if command is valid
+			enums::Check::Valid => {
+				let input_tokens: Vec<&str> = input.trim()
+					.split(" ").collect();
+				let command = input_tokens[1];
+				let mut arg = "";
+		
+				if input_tokens.len() == 3 {
+					arg = input_tokens[2];
+				}
+				cli::command_router::route_command(command, arg);
+			}
+			//if command is invalid
+			enums::Check::Invalid(msg) => println!("{}", msg),
 		}
-			
-		if input_tokens.len() < 2 || input_tokens.len() > 3 {
-			println!("Invalid command.\n");
-			continue;
-		}
-		
-		let command = input_tokens[1];
-		let mut arg = "";
-		
-		if input_tokens.len() == 3 {
-			arg = input_tokens[2];
-		}
-		
-		cli::command_router::route_command(command, arg);
     }
 }
