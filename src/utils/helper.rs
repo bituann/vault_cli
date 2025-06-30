@@ -49,5 +49,24 @@ pub fn check_command (command_str: &String) -> enums::Check {
 		return enums::Check::Invalid(msg);
 	}
 	
+	//only defined commands are accepted
+	let mut def_cmd = false;
+	for cmd in vec!["upload", "list", "read", "delete"] {
+		if command == cmd {
+			def_cmd = true;
+			break;
+		}
+	}
+	if !def_cmd {
+		let msg = String::from(format!("{} is an invalid command. Accepted commands are: upload, list, read, & delete.", command));
+		return enums::Check::Invalid(msg);
+	}
+	
+	//all commands except list must have an argument
+	if command != "list" && arg == "" {
+		let msg = String::from(format!("You have provided no argument for {}", command));
+		return enums::Check::Invalid(msg);
+	}
+	
 	return enums::Check::Valid;
 }
