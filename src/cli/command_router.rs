@@ -7,6 +7,6 @@ pub fn route_command (command: &str, arg: &str) -> enums::Outcome {
 		"list" => commands::list::list(),
 		"read" => commands::read::read(arg),
 		"delete" => commands::delete::delete(arg),
-		_ => enums::Outcome::Fail("Invalid command"),
+		_ => enums::Outcome::Fail(String::from("Invalid command")),
 	}
 }
