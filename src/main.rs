@@ -34,14 +34,12 @@ fn main() {
 		}
 		
 		let command = input_tokens[1];
-		let mut arg;
+		let mut arg = "";
 		
-		if input_tokens.len() == 2 {
-			arg = "";
-		} else {
+		if input_tokens.len() == 3 {
 			arg = input_tokens[2];
 		}
 		
-		cli::command_router::route_command(input_tokens);
+		cli::command_router::route_command(command, arg);
     }
 }
