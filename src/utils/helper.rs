@@ -18,14 +18,16 @@ pub fn check_command (command_str: &String) -> enums::Check {
 	let command;
 	let mut arg;
 	
+	//full command must start with 'vault'
 	if vault != "vault" {
-		let message = String::from("Start all commands with 'vault'\n");
-		return enums::Check::Invalid(message);
+		let msg = String::from("Start all commands with 'vault'\n");
+		return enums::Check::Invalid(msg);
 	}
 	
+	//entire command must consist of at least 2 parts and not nore than 3 parts
 	if command_tokens.len() < 2 || command_tokens.len() > 3 {
-		let message = String::from("Invalid command");
-		return enums::Check::Invalid(message);
+		let msg = String::from("Invalid command");
+		return enums::Check::Invalid(msg);
 	}
 	
 	command = command_tokens[1];
@@ -34,5 +36,18 @@ pub fn check_command (command_str: &String) -> enums::Check {
 	if command_tokens.len() == 3 {
 		arg = command_tokens[2];
 	}
+	
+	//command must be all lowercase
+	if !command.chars().all(|c| c.is_lowercase()) {
+		let msg = String::from(format!("{} is an invalid command. Accepted commands are: upload, list, read, & delete.", command));
+		return enums::Check::Invalid(msg);
+	}
+	
+	//list command must have no arguments
+	if command == "list" && arg != "" {
+		let msg = String::from("list command takes no arguments");
+		return enums::Check::Invalid(msg);
+	}
+	
 	return enums::Check::Valid;
 }
