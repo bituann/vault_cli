@@ -1,8 +1,25 @@
+use crate::cli::commands::Command;
 use crate::utils::enums;
+use crate::services::file_service;
 
-pub fn list () -> enums::Outcome {
-	let mut outcome_msg;
+pub struct List;
+
+impl Command for List {
+	fn execute (&self) -> enums::Outcome<String> {
+		//checks
+		
+		//execution
+		return file_service::list();
+		// return enums::Outcome::Success("hey".to_string());
+	}
 	
-	outcome_msg = String::from("Files listed successfully");
-	return enums::Outcome::Success(outcome_msg);
+	fn help (&self) -> String {
+		"Help".to_string()
+	}
+}
+
+impl List {
+	pub fn new() -> Self {
+		Self
+	}
 }

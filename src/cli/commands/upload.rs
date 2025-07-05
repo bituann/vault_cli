@@ -1,10 +1,28 @@
+use crate::cli::commands::Command;
 use crate::utils::enums;
+use crate::services::file_service;
 
-pub fn upload (file_path: &str) -> enums::Outcome {
-	let mut outcome_msg;
+pub struct Upload {
+	file_path: String,
+}
+
+impl Command for Upload {
+	fn execute (&self) -> enums::Outcome<String> {
+		//checks
+		
+		//execution
+		return file_service::upload(&self.file_path);
+	}
 	
-	let file_id = 0;
-	
-	outcome_msg = String::from(format!("File has been uploaded. File ID is: {}", file_id));
-	return enums::Outcome::Success(outcome_msg);
+	fn help (&self) -> String {
+		"Help".to_string()
+	}
+}
+
+impl Upload {
+	pub fn new(file_path: &str) -> Self {
+		Self {
+			file_path: String::from(file_path),
+		}
+	}
 }

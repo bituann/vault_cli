@@ -1,8 +1,28 @@
+use crate::cli::commands::Command;
 use crate::utils::enums;
+use crate::services::file_service;
 
-pub fn read (file_id: &str) -> enums::Outcome {
-	let mut outcome_msg;
+pub struct Read {
+	file_id: String,
+}
+
+impl Command for Read {
+	fn execute (&self) -> enums::Outcome<String> {
+		//checks
+		
+		//execution
+		return file_service::read(&self.file_id);
+	}
 	
-	outcome_msg = String::from(format!("File with ID {} has been read", file_id));
-	return enums::Outcome::Success(outcome_msg);
+	fn help (&self) -> String {
+		"Help".to_string()
+	}
+}
+
+impl Read {
+	pub fn new(file_id: &str) -> Self {
+		Self {
+			file_id: String::from(file_id),
+		}
+	}
 }
