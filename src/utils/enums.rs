@@ -7,7 +7,7 @@ pub enum Check {
 	Invalid(String),
 }
 
-pub enum Outcome {
-	Success(String),
+pub enum Outcome<T> {
+	Success(T),
 	Fail(String),
 }
