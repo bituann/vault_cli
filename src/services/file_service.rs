@@ -35,8 +35,37 @@ pub fn upload (file_path: &String) -> enums::Outcome<String> {
 	let file_metadata_json = serde_json::to_string(&file).unwrap();
 	
 	let metadata_file_path = "./src/storage/metadata.json";
+	let mut metadata_file_content = "".to_string();
 	
-	fs::OpenOptions::new().append(true).open(&metadata_file_path).unwrap().write(file_metadata_json.as_bytes()).unwrap();
+	fs::File::open(&metadata_file_path).unwrap().read_to_string(&mut metadata_file_content).unwrap();
+	
+	let mut files: Vec<File> = match serde_json::from_str(&metadata_file_content) {
+		Ok(files) => files,
+		Err(_) => Vec::new(),
+	};
+	
+	files.push(file);
+	
+	let mut files = files.iter().peekable();
+	
+	let mut metadata = fs::OpenOptions::new().write(true).open(&metadata_file_path).unwrap();
+	
+	let mut metadata_file_cont = "[".to_string();
+	
+	while let Some(file) = files.next() {
+		if files.peek().is_none() {
+			metadata_file_cont = format!("{}{}", metadata_file_cont, serde_json::to_string(&file).unwrap());
+			break;
+		}
+		
+		metadata_file_cont = format!("{}{},", metadata_file_cont, serde_json::to_string(&file).unwrap());
+	}
+	
+	metadata_file_cont = format!("{}{}", metadata_file_cont, "]");
+	
+	metadata.write(metadata_file_cont.as_bytes());
+	
+	//.write(format!("[{},{}]", metadata_file_content, file_metadata_json).as_bytes()).unwrap();
 	
 	//println!("{}", file_metadata_json);
 	
@@ -52,7 +81,7 @@ pub fn list () -> enums::Outcome<String> {
 	let file_metadata = fs::File::open(path).unwrap();
 	let files: Vec<File> = serde_json::from_reader(file_metadata).unwrap();
 	
-	println!("{}", format!("{:15} | {:40} | {:10} | {:25}", "id", "name", "size", "created on"));
+	println!("{}", format!("{:15} | {:40} | {:10}", "id", "name", "size"));
 	
 	for file in files {
 		println!("{}", format!("{:15} | {:40} | {:10}", file.file_id, file.file_name, file.file_size/*, file.date_created*/));
