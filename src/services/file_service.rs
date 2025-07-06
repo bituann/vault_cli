@@ -34,7 +34,11 @@ pub fn upload (file_path: &String) -> enums::Outcome<String> {
 	
 	let file_metadata_json = serde_json::to_string(&file).unwrap();
 	
-	println!("{}", file_metadata_json);
+	let metadata_file_path = "./src/storage/metadata.json";
+	
+	fs::OpenOptions::new().append(true).open(&metadata_file_path).unwrap().write(file_metadata_json.as_bytes()).unwrap();
+	
+	//println!("{}", file_metadata_json);
 	
 	enums::Outcome::Success("File uploaded successfully".to_string())
 }
