@@ -145,6 +145,7 @@ pub fn metadata (file_name: &String) -> enums::Outcome<String> {
 	let metadata_path = "./src/storage/metadata.json";
 	let mut files: Vec<File>;
 	
+	//read json file to 'files'
 	match json_to_vec(metadata_path) {
 		enums::Outcome::Success(received) => files = received,
 		enums::Outcome::Fail(msg) => {
@@ -153,13 +154,15 @@ pub fn metadata (file_name: &String) -> enums::Outcome<String> {
 		}
 	}
 	
+	//check for file and provide string representation
 	for file in files {
 		if file.file_name == *file_name {
-			let metadata_str = String::from(format!("{:?}", file));
+			let metadata_str = String::from(format!("{:#?}", file));
 			return enums::Outcome::Success(metadata_str);
 		}
 	}
 	
+	//if execution gets to this point, it has failed
 	let msg = String::from("Cannot read metadata. Ensure the file name is correct. You can use the list command to see the list of files");
 	return enums::Outcome::Fail(msg);
 }
