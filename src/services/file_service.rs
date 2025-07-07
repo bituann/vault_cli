@@ -34,19 +34,12 @@ pub fn upload (file_path: &String) -> enums::Outcome<String> {
 	
 	let file_metadata_json = serde_json::to_string(&file).unwrap();
 	
-	let metadata_file_path = "./src/storage/metadata.json";
-	let mut metadata_file_content = String::new();
+	let metadata_path = "./src/storage/metadata.json";
 	
-	fs::File::open(&metadata_file_path).unwrap().read_to_string(&mut metadata_file_content).unwrap();
-	
-	let mut files: Vec<File> = match serde_json::from_str(&metadata_file_content) {
-		Ok(files) => files,
-		Err(_) => Vec::new(),
-	};
-	
+	let mut files: Vec<File> = json_to_vec(metadata_path);
 	files.push(file);
 	
-	let outcome = update_metadata_json(files, metadata_file_path);
+	let outcome = update_metadata_json(files, metadata_path);
 	
 	match outcome {
 		enums::Outcome::Success(()) => enums::Outcome::Success("File uploaded successfully.".to_string()),
@@ -60,13 +53,12 @@ pub fn read (file_id: &String) -> enums::Outcome<String> {
 
 pub fn list () -> enums::Outcome<String> {
 	let path = "./src/storage/metadata.json";
-	let file_metadata = fs::File::open(path).unwrap();
-	let files: Vec<File> = serde_json::from_reader(file_metadata).unwrap();
+	let files: Vec<File> = json_to_vec(path);
 	
 	println!("{}", format!("{:15} | {:40} | {:10}", "id", "name", "size"));
 	
 	for file in files {
-		println!("{}", format!("{:15} | {:40} | {:10}", file.file_id, file.file_name, file.file_size/*, file.date_created*/));
+		println!("{}", format!("{:15} | {:40} | {:10}", file.file_id, file.file_name, file.file_size));
 	}
 	
 	let message = String::from("All files listed successfully");
@@ -88,6 +80,14 @@ pub fn delete (file_id: &String) -> enums::Outcome<String> {
 
 
 //helper functions
+fn json_to_vec (path: &str) -> Vec<File> {
+	let file_metadata = fs::File::open(path).unwrap();
+	match serde_json::from_reader(&file_metadata) {
+		Ok(files) => files,
+		Err(_) => Vec::new(),
+	}
+}
+
 fn update_metadata_json (files: Vec<File>, path: &str) -> enums::Outcome<()> {
 	let mut files = files.iter().peekable();
 	
