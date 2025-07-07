@@ -86,7 +86,6 @@ pub fn list () -> enums::Outcome<String> {
 }
 
 pub fn delete (file_name: &String) -> enums::Outcome<String> {
-	let f_name = helper::get_file_name(file_name);
 	let path = "./src/storage/metadata.json";
 	let mut files: Vec<File>;
 	
@@ -95,14 +94,21 @@ pub fn delete (file_name: &String) -> enums::Outcome<String> {
 		enums::Outcome::Fail(msg) => return enums::Outcome::Fail(msg)
 	};
 	
-	let f_path = format!("./src/storage/uploads/{}", f_name);
-	fs::remove_file(f_path);
+	let file_path = format!("./src/storage/uploads/{}", file_name);
+	fs::remove_file(file_path);
 	
-	files.retain(|file| file.file_name != f_name);
+	files.retain(|file| file.file_name != *file_name);
 	
-	update_metadata_json(files, path);
-	
-	enums::Outcome::Success("Woo".to_string())
+	match update_metadata_json(files, path) {
+		enums::Outcome::Success(()) => {
+			let msg = String::from("File deleted successfully");
+			return enums::Outcome::Success(msg);
+		}
+		enums::Outcome::Fail(msg) => {
+			let msg = String::from("Unable to delete file");
+			return enums::Outcome::Fail(msg);
+		}
+	}
 }
 
 
@@ -135,7 +141,15 @@ fn json_to_vec (path: &str) -> enums::Outcome<Vec<File>> {
 fn update_metadata_json (files: Vec<File>, path: &str) -> enums::Outcome<()> {
 	let mut files = files.iter().peekable();
 	
-	let mut metadata = fs::File::create(&path).unwrap();
+	let mut metadata;
+	
+	match fs::File::create(&path) {
+		Ok(file) => metadata = file,
+		Err(_) => {
+			let msg = String::from("Cannot access database");
+			return enums::Outcome::Fail(msg);
+		}
+	}
 	
 	let mut json_string = "[".to_string();
 	
