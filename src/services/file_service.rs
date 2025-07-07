@@ -36,7 +36,12 @@ pub fn upload (file_path: &String) -> enums::Outcome<String> {
 	
 	let metadata_path = "./src/storage/metadata.json";
 	
-	let mut files: Vec<File> = json_to_vec(metadata_path);
+	let mut files: Vec<File>;
+	
+	match json_to_vec(metadata_path) {
+		enums::Outcome::Success(received) => files = received,
+		enums::Outcome::Fail(msg) => return enums::Outcome::Fail(msg)
+	}
 	files.push(file);
 	
 	let outcome = update_metadata_json(files, metadata_path);
@@ -63,22 +68,32 @@ pub fn read (file_name: &String) -> enums::Outcome<String> {
 
 pub fn list () -> enums::Outcome<String> {
 	let path = "./src/storage/metadata.json";
-	let files: Vec<File> = json_to_vec(path);
+	let mut files: Vec<File>;
 	
-	println!("{}", format!("{:15} | {:40} | {:10}", "id", "name", "size"));
+	match json_to_vec(path) {
+		enums::Outcome::Success(received) => files = received,
+		enums::Outcome::Fail(msg) => return enums::Outcome::Fail(msg)
+	};
+	
+	let mut file_list = format!("{:15} | {:40} | {:10}\n", "id", "name", "size");
 	
 	for file in files {
-		println!("{}", format!("{:15} | {:40} | {:10}", file.file_id, file.file_name, file.file_size));
+		file_list = format!("{}{:15} | {:40} | {:10}\n", file_list, file.file_id, file.file_name, file.file_size);
 	}
 	
-	let message = String::from("All files listed successfully");
-	enums::Outcome::Success(message)
+	let file_list = String::from(file_list);
+	enums::Outcome::Success(file_list)
 }
 
 pub fn delete (file_name: &String) -> enums::Outcome<String> {
 	let f_name = helper::get_file_name(file_name);
 	let path = "./src/storage/metadata.json";
-	let mut files: Vec<File> = json_to_vec(path);
+	let mut files: Vec<File>;
+	
+	match json_to_vec(path) {
+		enums::Outcome::Success(received) => files = received,
+		enums::Outcome::Fail(msg) => return enums::Outcome::Fail(msg)
+	};
 	
 	let f_path = format!("./src/storage/uploads/{}", f_name);
 	fs::remove_file(f_path);
@@ -100,11 +115,20 @@ pub fn delete (file_name: &String) -> enums::Outcome<String> {
 
 
 //helper functions
-fn json_to_vec (path: &str) -> Vec<File> {
-	let file_metadata = fs::File::open(path).unwrap();
+fn json_to_vec (path: &str) -> enums::Outcome<Vec<File>> {
+	let mut file_metadata;
+	
+	match fs::File::open(path) {
+		Ok(file) => file_metadata = file,
+		Err(_) => {
+			let msg = String::from("Unable to access database");
+			return enums::Outcome::Fail(msg);
+		}
+	}
+	
 	match serde_json::from_reader(&file_metadata) {
-		Ok(files) => files,
-		Err(_) => Vec::new(),
+		Ok(files) => enums::Outcome::Success(files),
+		Err(_) => enums::Outcome::Success(Vec::new()),
 	}
 }
 
