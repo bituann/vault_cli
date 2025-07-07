@@ -8,14 +8,25 @@ pub struct Read {
 
 impl Command for Read {
 	fn execute (&self) -> enums::Outcome<String> {
-		//checks
+		/*================ CHECKS =================*/
+		//check if file exists
+		if file_service::file_exists(&self.file_name) {
+			let msg = String::from("File does not exist. Check if the file name is correct, or use the list command to check available files");
+			return enums::Outcome::Fail(msg);
+		}
 		
-		//execution
+		/*================ EXECUTION =================*/
 		return file_service::read(&self.file_name);
 	}
 	
 	fn help (&self) -> String {
-		"Help".to_string()
+		String::from(r#"
+		The read command follows this structure:
+		
+		vault read file_name
+		
+		where 'file_name' is the name of the file when the file was uploaded.
+		"#)
 	}
 }
 

@@ -8,14 +8,25 @@ pub struct Delete {
 
 impl Command for Delete {
 	fn execute (&self) -> enums::Outcome<String> {
-		//checks
+		/*================ CHECKS =================*/
+		//check if file exists
+		if file_service::file_exists(&self.file_name) {
+			let msg = String::from("File does not exist. Check if the file name is correct, or use the list command to check available files");
+			return enums::Outcome::Fail(msg);
+		}
 		
-		//execution
+		/*================ EXECUTION =================*/
 		return file_service::delete(&self.file_name);
 	}
 	
 	fn help (&self) -> String {
-		"Help".to_string()
+		String::from(r#"
+		The upload command follows this structure:
+		
+		vault delete file_name
+		
+		where 'file_name' is the name of the file you uploaded.
+		"#)
 	}
 }
 

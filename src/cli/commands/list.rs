@@ -6,15 +6,18 @@ pub struct List;
 
 impl Command for List {
 	fn execute (&self) -> enums::Outcome<String> {
-		//checks
-		
-		//execution
+		/*================ EXECUTION =================*/
 		return file_service::list();
-		// return enums::Outcome::Success("hey".to_string());
 	}
 	
 	fn help (&self) -> String {
-		"Help".to_string()
+		String::from(r#"
+		The list command follows this structure:
+		
+		vault list
+		
+		This command does not take any argumentsc
+		"#)
 	}
 }
 
