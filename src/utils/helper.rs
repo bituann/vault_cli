@@ -11,7 +11,7 @@ pub fn get_input (stored_in: &mut String) {
 	io::stdin().read_line(stored_in).expect("Failed to read line");
 }
 
-pub fn check_command (command_str: &String) -> enums::Check {
+pub fn check_command (command_str: &String) -> enums::Check<Vec<&str>> {
 	let command_tokens: Vec<&str> = command_str.trim()
 		.split(" ").collect();
 		
@@ -21,7 +21,7 @@ pub fn check_command (command_str: &String) -> enums::Check {
 	
 	//full command must start with 'vault'
 	if vault != "vault" {
-		let msg = String::from("Start all commands with 'vault'\n");
+		let msg = String::from("Start all commands with 'vault'");
 		return enums::Check::Invalid(msg);
 	}
 	
@@ -69,7 +69,7 @@ pub fn check_command (command_str: &String) -> enums::Check {
 		return enums::Check::Invalid(msg);
 	}
 	
-	return enums::Check::Valid;
+	return enums::Check::Valid(command_tokens);
 }
 
 pub fn get_file_name (path: &String) -> &str {
