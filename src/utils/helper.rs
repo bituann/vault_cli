@@ -44,9 +44,9 @@ pub fn check_command (command_str: &String) -> enums::Check<Vec<&str>> {
 		return enums::Check::Invalid(msg);
 	}
 	
-	//list command must have no arguments
-	if command == "list" && arg != "" {
-		let msg = String::from("list command takes no arguments");
+	//list command must have no arguments except help
+	if command == "list" && arg != "" && arg != "help" {
+		let msg = String::from("list command takes no arguments except 'help'");
 		return enums::Check::Invalid(msg);
 	}
 	
