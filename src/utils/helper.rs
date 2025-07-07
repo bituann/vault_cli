@@ -1,4 +1,5 @@
 use std::io::{self, Write};
+use std::fs;
 use crate::utils::enums;
 
 pub fn print (text: &str) {
@@ -69,4 +70,8 @@ pub fn check_command (command_str: &String) -> enums::Check {
 	}
 	
 	return enums::Check::Valid;
+}
+
+pub fn get_file_name (path: &String) -> &str {
+	path.trim().split("/").collect::<Vec<&str>>().pop().unwrap()
 }
