@@ -2,8 +2,8 @@ enum InvalidCommand {
 	
 }
 
-pub enum Check {
-	Valid,
+pub enum Check<T> {
+	Valid(T),
 	Invalid(String),
 }
 
