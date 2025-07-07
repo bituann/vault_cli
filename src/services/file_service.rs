@@ -48,6 +48,13 @@ pub fn upload (file_path: &String) -> enums::Outcome<String> {
 }
 
 pub fn read (file_name: &String) -> enums::Outcome<String> {
+	let f_name = helper::get_file_name(file_name);
+	let mut file = fs::File::open(format!("./src/storage/uploads/{}", f_name)).unwrap();
+	let mut content = String::new();
+	
+	file.read_to_string(&mut content).unwrap();
+	
+	println!("{}", content);
 	
 	enums::Outcome::Success("Woo".to_string())
 }
