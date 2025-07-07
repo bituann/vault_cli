@@ -16,7 +16,7 @@ impl Command for Delete {
 		}
 		
 		//check if file exists
-		if file_service::file_exists(&self.file_name) {
+		if !file_service::file_exists(&self.file_name) {
 			let msg = String::from("File does not exist. Check if the file name is correct, or use the list command to check available files");
 			return enums::Outcome::Fail(msg);
 		}
