@@ -7,6 +7,7 @@ pub fn route_command (command: &str, arg: &str) -> enums::Outcome<String> {
 		"list" => list::List::new(arg).execute(),
 		"read" => read::Read::new(arg).execute(),
 		"delete" => delete::Delete::new(arg).execute(),
+		"metadata" => metadata::Metadata::new(arg).execute(),
 		_ => enums::Outcome::Fail(String::from("Invalid command")),
 	}
 }

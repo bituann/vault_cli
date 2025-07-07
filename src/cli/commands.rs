@@ -1,5 +1,6 @@
 pub mod delete;
 pub mod list;
+pub mod metadata;
 pub mod read;
 pub mod upload;
 

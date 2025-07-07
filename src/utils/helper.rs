@@ -52,14 +52,14 @@ pub fn check_command (command_str: &String) -> enums::Check<Vec<&str>> {
 	
 	//only defined commands are accepted
 	let mut def_cmd = false;
-	for cmd in vec!["upload", "list", "read", "delete"] {
+	for cmd in vec!["upload", "list", "read", "delete", "metadata"] {
 		if command == cmd {
 			def_cmd = true;
 			break;
 		}
 	}
 	if !def_cmd {
-		let msg = String::from(format!("{} is an invalid command. Accepted commands are: upload, list, read, & delete.", command));
+		let msg = String::from(format!("{} is an invalid command. Accepted commands are: upload, list, read, delete, & metadata.", command));
 		return enums::Check::Invalid(msg);
 	}
 	
