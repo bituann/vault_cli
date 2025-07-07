@@ -11,6 +11,12 @@ impl Command for Upload {
 		let file_name = String::from(helper::get_file_name(&self.file_path));
 		
 		/*================ CHECKS =================*/
+		//check if help is needed
+		if self.file_path == "help" {
+			let msg = self.help();
+			return enums::Outcome::Success(msg);
+		}
+		
 		//check if file exists
 		if file_service::file_exists(&file_name) {
 			let msg = String::from("File already exists. Select a different file or rename the file");

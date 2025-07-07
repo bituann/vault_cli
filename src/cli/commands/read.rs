@@ -9,6 +9,12 @@ pub struct Read {
 impl Command for Read {
 	fn execute (&self) -> enums::Outcome<String> {
 		/*================ CHECKS =================*/
+		//check if help is needed
+		if self.file_name == "help" {
+			let msg = self.help();
+			return enums::Outcome::Success(msg);
+		}
+		
 		//check if file exists
 		if file_service::file_exists(&self.file_name) {
 			let msg = String::from("File does not exist. Check if the file name is correct, or use the list command to check available files");
