@@ -1,9 +1,9 @@
 use crate::cli::commands::Command;
-use crate::utils::enums;
+use crate::utils::{enums, helper};
 use crate::services::file_service;
 
 pub struct Delete {
-	file_id: String,
+	file_name: String,
 }
 
 impl Command for Delete {
@@ -11,7 +11,7 @@ impl Command for Delete {
 		//checks
 		
 		//execution
-		return file_service::read(&self.file_id);
+		return file_service::delete(&self.file_name);
 	}
 	
 	fn help (&self) -> String {
@@ -20,9 +20,12 @@ impl Command for Delete {
 }
 
 impl Delete {
-	pub fn new(file_id: &str) -> Self {
+	pub fn new(file_path: &str) -> Self {
+		let file_path = String::from(file_path);
+		let file_name = helper::get_file_name(&file_path);
+		
 		Self {
-			file_id: String::from(file_id),
+			file_name: String::from(file_name),
 		}
 	}
 }
