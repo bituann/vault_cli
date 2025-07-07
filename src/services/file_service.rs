@@ -15,7 +15,7 @@ struct File {
 }
 
 pub fn upload (file_path: &String) -> enums::Outcome<String> {
-	let file_name = file_path.trim().split("/").collect::<Vec<&str>>().pop().unwrap();
+	let file_name = helper::get_file_name(file_path);
 	
 	let destination = format!("./src/storage/uploads/{}", file_name);
 	
@@ -48,15 +48,17 @@ pub fn upload (file_path: &String) -> enums::Outcome<String> {
 }
 
 pub fn read (file_name: &String) -> enums::Outcome<String> {
-	let f_name = helper::get_file_name(file_name);
-	let mut file = fs::File::open(format!("./src/storage/uploads/{}", f_name)).unwrap();
-	let mut content = String::new();
+	let file_path = format!("./src/storage/uploads/{}", file_name);
 	
-	file.read_to_string(&mut content).unwrap();
+	let content = match fs::read_to_string(&file_path) {
+		Ok(content) => content,
+		Err(_) => {
+			let msg = String::from("Cannot read file. Check if the file name is correct");
+			return enums::Outcome::Fail(msg);
+		}
+	};
 	
-	println!("{}", content);
-	
-	enums::Outcome::Success("Woo".to_string())
+	enums::Outcome::Success(content)
 }
 
 pub fn list () -> enums::Outcome<String> {
@@ -78,7 +80,8 @@ pub fn delete (file_name: &String) -> enums::Outcome<String> {
 	let path = "./src/storage/metadata.json";
 	let mut files: Vec<File> = json_to_vec(path);
 	
-	fs::remove_file(file_name);
+	let f_path = format!("./src/storage/uploads/{}", f_name);
+	fs::remove_file(f_path);
 	
 	files.retain(|file| file.file_name != f_name);
 	
