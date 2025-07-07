@@ -125,6 +125,24 @@ pub fn delete (file_name: &String) -> enums::Outcome<String> {
 	}
 }
 
+pub fn file_exists (file_name: &String) -> bool {
+	let metadata_path = "./src/storage/uploads/metadata.json";
+	
+	let mut files: Vec<File>;
+	
+	match json_to_vec(metadata_path) {
+		enums::Outcome::Success(received) => files = received,
+		enums::Outcome::Fail(_) => return false
+	}
+	
+	for file in files {
+		if file.file_name == *file_name {
+			return true;
+		}
+	}
+	
+	false
+}
 
 
 
