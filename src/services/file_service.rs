@@ -47,7 +47,8 @@ pub fn upload (file_path: &String) -> enums::Outcome<String> {
 	}
 }
 
-pub fn read (file_id: &String) -> enums::Outcome<String> {
+pub fn read (file_name: &String) -> enums::Outcome<String> {
+	
 	enums::Outcome::Success("Woo".to_string())
 }
 
@@ -65,7 +66,16 @@ pub fn list () -> enums::Outcome<String> {
 	enums::Outcome::Success(message)
 }
 
-pub fn delete (file_id: &String) -> enums::Outcome<String> {
+pub fn delete (file_name: &String) -> enums::Outcome<String> {
+	let f_name = helper::get_file_name(file_name);
+	let path = "./src/storage/metadata.json";
+	let mut files: Vec<File> = json_to_vec(path);
+	
+	fs::remove_file(file_name);
+	
+	files.retain(|file| file.file_name != f_name);
+	
+	update_metadata_json(files, path);
 	
 	enums::Outcome::Success("Woo".to_string())
 }
@@ -91,7 +101,7 @@ fn json_to_vec (path: &str) -> Vec<File> {
 fn update_metadata_json (files: Vec<File>, path: &str) -> enums::Outcome<()> {
 	let mut files = files.iter().peekable();
 	
-	let mut metadata = fs::OpenOptions::new().write(true).open(&path).unwrap();
+	let mut metadata = fs::File::create(&path).unwrap();
 	
 	let mut json_string = "[".to_string();
 	
