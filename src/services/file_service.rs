@@ -106,7 +106,7 @@ pub fn delete (file_name: &String) -> enums::Outcome<String> {
 	match fs::remove_file(file_path) {
 		Ok(_) => (),
 		Err(_) => {
-			let msg = String::from("Unable to delete file. Check if file nane is correct");
+			let msg = String::from("Unable to delete file. Check if file name is correct");
 			return enums::Outcome::Fail(msg);
 		}
 	};
