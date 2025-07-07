@@ -1,6 +1,6 @@
 use std::fs;
 use std::io::{Error, Read, Write};
-use crate::utils::enums;
+use crate::utils::{enums, helper};
 use serde::{Serialize, Deserialize};
 use serde_json::Result;
 use std::path::Path;
@@ -35,7 +35,7 @@ pub fn upload (file_path: &String) -> enums::Outcome<String> {
 	let file_metadata_json = serde_json::to_string(&file).unwrap();
 	
 	let metadata_file_path = "./src/storage/metadata.json";
-	let mut metadata_file_content = "".to_string();
+	let mut metadata_file_content = String::new();
 	
 	fs::File::open(&metadata_file_path).unwrap().read_to_string(&mut metadata_file_content).unwrap();
 	
@@ -46,30 +46,12 @@ pub fn upload (file_path: &String) -> enums::Outcome<String> {
 	
 	files.push(file);
 	
-	let mut files = files.iter().peekable();
+	let outcome = update_metadata_json(files, metadata_file_path);
 	
-	let mut metadata = fs::OpenOptions::new().write(true).open(&metadata_file_path).unwrap();
-	
-	let mut metadata_file_cont = "[".to_string();
-	
-	while let Some(file) = files.next() {
-		if files.peek().is_none() {
-			metadata_file_cont = format!("{}{}", metadata_file_cont, serde_json::to_string(&file).unwrap());
-			break;
-		}
-		
-		metadata_file_cont = format!("{}{},", metadata_file_cont, serde_json::to_string(&file).unwrap());
+	match outcome {
+		enums::Outcome::Success(()) => enums::Outcome::Success("File uploaded successfully.".to_string()),
+		enums::Outcome::Fail(msg) => enums::Outcome::Fail("Internal Error.".to_string())
 	}
-	
-	metadata_file_cont = format!("{}{}", metadata_file_cont, "]");
-	
-	metadata.write(metadata_file_cont.as_bytes());
-	
-	//.write(format!("[{},{}]", metadata_file_content, file_metadata_json).as_bytes()).unwrap();
-	
-	//println!("{}", file_metadata_json);
-	
-	enums::Outcome::Success("File uploaded successfully".to_string())
 }
 
 pub fn read (file_id: &String) -> enums::Outcome<String> {
@@ -94,4 +76,37 @@ pub fn list () -> enums::Outcome<String> {
 pub fn delete (file_id: &String) -> enums::Outcome<String> {
 	
 	enums::Outcome::Success("Woo".to_string())
+}
+
+
+
+
+
+
+
+
+
+
+//helper functions
+fn update_metadata_json (files: Vec<File>, path: &str) -> enums::Outcome<()> {
+	let mut files = files.iter().peekable();
+	
+	let mut metadata = fs::OpenOptions::new().write(true).open(&path).unwrap();
+	
+	let mut json_string = "[".to_string();
+	
+	while let Some(file) = files.next() {
+		if files.peek().is_none() {
+			json_string = format!("{}{}", json_string, serde_json::to_string(&file).unwrap());
+			break;
+		}
+		
+		json_string = format!("{}{},", json_string, serde_json::to_string(&file).unwrap());
+	}
+	
+	json_string = format!("{}{}", json_string, "]");
+	
+	metadata.write(json_string.as_bytes());
+	
+	enums::Outcome::Success(())
 }
