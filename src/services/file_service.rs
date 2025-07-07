@@ -1,10 +1,8 @@
 use std::fs;
-use std::io::{Error, Read, Write};
+use std::io::{Read, Write};
 use crate::utils::{enums, helper};
 use serde::{Serialize, Deserialize};
 use serde_json::Result;
-use std::path::Path;
-use std::time::UNIX_EPOCH;
 
 #[derive(Serialize, Deserialize)]
 struct File {
@@ -19,9 +17,18 @@ pub fn upload (file_path: &String) -> enums::Outcome<String> {
 	
 	let destination = format!("./src/storage/uploads/{}", file_name);
 	
-	fs::copy(&file_path, &destination).unwrap();
+	match fs::copy(&file_path, &destination) {
+		Ok(_) => (),
+		Err(_) => {
+			let msg = String::from("Unable to upload. Check if file path is correct");
+			return enums::Outcome::Fail(msg)
+		}
+	};
 	
-	let file_size = fs::metadata(&destination).unwrap().len();
+	let file_size = match fs::metadata(&destination) {
+		Ok(file) => file.len(),
+		Err(msg) => 0
+	};
 	
 	//let date_created = fs::metadata(&destination).unwrap().created().unwrap().duration_since(UNIX_EPOCH).unwrap();
 	
@@ -95,7 +102,14 @@ pub fn delete (file_name: &String) -> enums::Outcome<String> {
 	};
 	
 	let file_path = format!("./src/storage/uploads/{}", file_name);
-	fs::remove_file(file_path);
+	
+	match fs::remove_file(file_path) {
+		Ok(_) => (),
+		Err(_) => {
+			let msg = String::from("Unable to delete file. Check if file nane is correct");
+			return enums::Outcome::Fail(msg);
+		}
+	};
 	
 	files.retain(|file| file.file_name != *file_name);
 	
