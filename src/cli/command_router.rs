@@ -1,6 +1,5 @@
 use crate::cli::commands::*;
 use crate::utils::enums;
-use std::collections::HashMap;
 
 pub fn route_command (command: &str, arg: &str) -> enums::Outcome<String> {
 	match command {
