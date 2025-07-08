@@ -10,6 +10,7 @@ pub fn route_command (command: &str, arg: &str) -> enums::Outcome<String> {
 		"metadata" => metadata::Metadata::new(arg).execute(),
 		"register" => register::Register::new(arg).execute(),
 		"login" => login::Login::new(arg).execute(),
+		"logout" => logout::Logout::new(arg).execute(),
 		_ => enums::Outcome::Fail(String::from("Invalid command")),
 	}
 }

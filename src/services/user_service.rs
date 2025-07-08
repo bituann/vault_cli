@@ -70,6 +70,22 @@ pub fn login (email: &String, password: &String) -> enums::Outcome<String> {
 	}
 }
 
+pub fn logout () -> enums::Outcome<String> {
+	let path = "./src/storage/.vault-session";
+	let session;
+	
+	match fs::File::create(path) {
+		Ok(file) => session = file,
+		Err(_) => {
+			let msg = String::from("Error logging out. Try exiting the application");
+			return enums::Outcome::Fail(msg);
+		}
+	}
+	
+	let msg = String::from("Logged out successfully");
+	return enums::Outcome::Success(msg);
+}
+
 pub fn check_user (email: &String) -> bool {
 	match get_user(email) {
 		enums::Outcome::Success(_) => return true,
