@@ -37,8 +37,29 @@ pub fn register (email: String, password: String) -> enums::Outcome<String> {
 }
 
 pub fn login (email: &String, password: &String) -> enums::Outcome<String> {
+	let session_token;
+	//hash password
+	let password = calculate_hash(password);
 	
-	enums::Outcome::Success(String::from(""))
+	//get user struct
+	let mut user: User;
+	
+	match get_user(email) {
+		enums::Outcome::Success(usr) => user = usr,
+		enums::Outcome::Fail(msg) => {
+			let msg = String::from("User does not exist");
+			return enums::Outcome::Fail(msg);
+		}
+	}
+	
+	if user.password == password {
+		session_token = Uuid::new_v4().to_string();
+		fs::File::create("./src/storage/.vault-session").unwrap().write(session_token.as_bytes());
+		return enums::Outcome::Success(session_token);
+	}
+	
+	let msg = String::from("Unable to login");
+	return enums::Outcome::Fail(msg);
 }
 
 
@@ -96,7 +117,23 @@ fn add_user (user: User) -> enums::Outcome<()> {
 	return update_userdata_json(users);
 }
 
-
+fn get_user (email: &String) -> enums::Outcome<User> {
+	let users;
+	
+	match get_users_as_vec() {
+		enums::Outcome::Success(usrs) => users = usrs,
+		enums::Outcome::Fail(msg) => return enums::Outcome::Fail(msg)
+	}
+	
+	for user in users {
+		if user.email == *email {
+			return enums::Outcome::Success(user);
+		}
+	}
+	
+	let msg = String::from("User does not exist");
+	return enums::Outcome::Fail(msg)
+}
 
 fn update_userdata_json (users: Vec<User>) -> enums::Outcome<()> {
 	let path = "./src/storage/userdata.json";
