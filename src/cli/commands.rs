@@ -3,6 +3,8 @@ pub mod list;
 pub mod metadata;
 pub mod read;
 pub mod upload;
+pub mod register;
+pub mod login;
 
 use crate::utils::enums;
 
