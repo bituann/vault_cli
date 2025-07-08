@@ -56,10 +56,10 @@ pub fn login (email: &String, password: &String) -> enums::Outcome<String> {
 		session_token = Uuid::new_v4().to_string();
 		fs::File::create("./src/storage/.vault-session").unwrap().write(session_token.as_bytes());
 		return enums::Outcome::Success(session_token);
+	} else {
+		let msg = String::from("Incorrect password");
+		return enums::Outcome::Fail(msg);
 	}
-	
-	let msg = String::from("Unable to login");
-	return enums::Outcome::Fail(msg);
 }
 
 pub fn check_user (email: &String) -> bool {

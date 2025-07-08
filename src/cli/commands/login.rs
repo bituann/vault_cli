@@ -1,5 +1,5 @@
 use crate::cli::commands::Command;
-use crate::utils::enums;
+use crate::utils::*;
 use crate::services::user_service;
 
 pub struct Login {
@@ -16,8 +16,14 @@ impl Command for Login {
 		}
 		
 		/*================ EXECUTION =================*/
-		let email = String::new();
-		let password = String::new();
+		let mut email = String::new();
+		let mut password = String::new();
+		
+		helper::print("Email: ");
+		helper::get_input(&mut email);
+		
+		helper::print("Password: ");
+		helper::get_input(&mut password);
 		
 		return user_service::login(&email, &password);
 	}
@@ -30,7 +36,7 @@ impl Command for Login {
 		
 		This command does not take any arguments except 'help'
 		
-		On command execution, you will be required to provide a valid username and password in order to gain accessc
+		On command execution, you will be required to provide a valid username and password in order to gain access.
 		"#)
 	}
 }
