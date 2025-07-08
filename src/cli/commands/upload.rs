@@ -1,6 +1,6 @@
 use crate::cli::commands::Command;
 use crate::utils::*;
-use crate::services::file_service;
+use crate::services::*;
 
 pub struct Upload {
 	file_path: String,
@@ -11,6 +11,12 @@ impl Command for Upload {
 		let file_name = String::from(helper::get_file_name(&self.file_path));
 		
 		/*================ CHECKS =================*/
+		//user authentication
+		if !user_service::authenticate() {
+			let msg = String::from("Please log in to use this command");
+			return enums::Outcome::Fail(msg);
+		}
+		
 		//check if help is needed
 		if self.file_path == "help" {
 			let msg = self.help();

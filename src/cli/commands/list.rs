@@ -1,6 +1,6 @@
 use crate::cli::commands::Command;
 use crate::utils::enums;
-use crate::services::file_service;
+use crate::services::*;
 
 pub struct List {
 	help: String
@@ -9,6 +9,12 @@ pub struct List {
 impl Command for List {
 	fn execute (&self) -> enums::Outcome<String> {
 		/*================ CHECKS =================*/
+		//user authentication
+		if !user_service::authenticate() {
+			let msg = String::from("Please log in to use this command");
+			return enums::Outcome::Fail(msg);
+		}
+		
 		//check if help is needed
 		if self.help == "help" {
 			let msg = self.help();

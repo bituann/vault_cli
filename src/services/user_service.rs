@@ -77,6 +77,16 @@ pub fn check_user (email: &String) -> bool {
 	}
 }
 
+pub fn authenticate () -> bool {
+	let path = "./src/storage/.vault-session";
+	
+	if fs::metadata(path).unwrap().len() == 0 {
+		return false;
+	}
+	
+	return true;
+}
+
 
 
 

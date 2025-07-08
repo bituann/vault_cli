@@ -1,6 +1,6 @@
 use crate::cli::commands::Command;
 use crate::utils::{enums, helper};
-use crate::services::file_service;
+use crate::services::*;
 
 pub struct Metadata {
 	file_name: String,
@@ -9,6 +9,12 @@ pub struct Metadata {
 impl Command for Metadata {
 	fn execute (&self) -> enums::Outcome<String> {
 		/*================ CHECKS =================*/
+		//user authentication
+		if !user_service::authenticate() {
+			let msg = String::from("Please log in to use this command");
+			return enums::Outcome::Fail(msg);
+		}
+		
 		//check if help is needed
 		if self.file_name == "help" {
 			let msg = self.help();
