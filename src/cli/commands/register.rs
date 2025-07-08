@@ -1,5 +1,5 @@
 use crate::cli::commands::Command;
-use crate::utils::enums;
+use crate::utils::*;
 use crate::services::user_service;
 
 pub struct Register {
@@ -15,10 +15,24 @@ impl Command for Register {
 			return enums::Outcome::Success(msg);
 		}
 		
+		/*=============== COLLECT DETAILS ================*/
+		let mut email = String::new();
+		let mut password = String::new();
+		
+		helper::print("Email: ");
+		helper::get_input(&mut email);
+		
+		helper::print("Password: ");
+		helper::get_input(&mut password);
+		
+		/*================ CHECKS =================*/
+		if user_service::check_user(&email) {
+			let msg = String::from("An account with that email already exists");
+			return enums::Outcome::Fail(msg);
+		}
+		
 		/*================ EXECUTION =================*/
-		let email = String::new();
-		let password = String::new();
-		return user_service::register(&email, &password);
+		return user_service::register(email, password);
 	}
 	
 	fn help (&self) -> String {

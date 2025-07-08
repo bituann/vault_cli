@@ -62,7 +62,12 @@ pub fn login (email: &String, password: &String) -> enums::Outcome<String> {
 	return enums::Outcome::Fail(msg);
 }
 
-
+pub fn check_user (email: &String) -> bool {
+	match get_user(email) {
+		enums::Outcome::Success(_) => return true,
+		enums::Outcome::Fail(_) => return false
+	}
+}
 
 
 

@@ -44,15 +44,9 @@ pub fn check_command (command_str: &String) -> enums::Check<Vec<&str>> {
 		return enums::Check::Invalid(msg);
 	}
 	
-	//list command must have no arguments except help
-	if command == "list" && arg != "" && arg != "help" {
-		let msg = String::from("list command takes no arguments except 'help'");
-		return enums::Check::Invalid(msg);
-	}
-	
 	//only defined commands are accepted
 	let mut def_cmd = false;
-	for cmd in vec!["upload", "list", "read", "delete", "metadata"] {
+	for cmd in vec!["upload", "list", "read", "delete", "metadata", "register", "login"] {
 		if command == cmd {
 			def_cmd = true;
 			break;
@@ -63,8 +57,23 @@ pub fn check_command (command_str: &String) -> enums::Check<Vec<&str>> {
 		return enums::Check::Invalid(msg);
 	}
 	
-	//all commands except list must have an argument
-	if command != "list" && arg == "" {
+	//set flag for commands with argument
+	let mut cmd_with_arg = true;
+	
+	//these commands must have no arguments except help
+	for cmd in vec!["list", "register", "login"] {
+		//unset flag for commands with argument
+		if command == cmd {
+			cmd_with_arg = false;
+		}
+		if command == cmd && arg != "" && arg != "help" {
+			let msg = String::from(format!("{} command takes no arguments except 'help'", command));
+			return enums::Check::Invalid(msg);
+		}
+	}
+	
+	//all other commands except list must have an argument
+	if cmd_with_arg && (arg == "") {
 		let msg = String::from(format!("You have provided no argument for {}", command));
 		return enums::Check::Invalid(msg);
 	}
