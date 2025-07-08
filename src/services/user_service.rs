@@ -17,8 +17,11 @@ pub fn register (email: String, password: String) -> enums::Outcome<String> {
 	//generate user id
 	let id = Uuid::new_v4().to_string();
 	
+	//append id to password
+	let mut password = format!("{}{}", password, id);
+	
 	//hash password
-	let password = calculate_hash(&password);
+	password = calculate_hash(&password);
 	
 	//create user struct
 	let user = User { id, email, password };
@@ -38,8 +41,6 @@ pub fn register (email: String, password: String) -> enums::Outcome<String> {
 
 pub fn login (email: &String, password: &String) -> enums::Outcome<String> {
 	let session_token;
-	//hash password
-	let password = calculate_hash(password);
 	
 	//get user struct
 	let mut user: User;
@@ -51,6 +52,13 @@ pub fn login (email: &String, password: &String) -> enums::Outcome<String> {
 			return enums::Outcome::Fail(msg);
 		}
 	}
+	
+	//append id to password
+	let mut password = format!("{}{}", password, user.id);
+	
+	//hash password
+	password = calculate_hash(&password);
+	
 	
 	if user.password == password {
 		session_token = Uuid::new_v4().to_string();
