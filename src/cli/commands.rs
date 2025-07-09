@@ -6,6 +6,7 @@ pub mod upload;
 pub mod register;
 pub mod login;
 pub mod logout;
+pub mod whoami;
 
 use crate::utils::enums;
 

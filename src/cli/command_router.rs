@@ -11,6 +11,7 @@ pub fn route_command (command: &str, arg: &str) -> enums::Outcome<String> {
 		"register" => register::Register::new(arg).execute(),
 		"login" => login::Login::new(arg).execute(),
 		"logout" => logout::Logout::new(arg).execute(),
+		"whoami" => whoami::Whoami::new(arg).execute(),
 		_ => enums::Outcome::Fail(String::from("Invalid command")),
 	}
 }

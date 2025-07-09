@@ -102,12 +102,12 @@ pub fn authenticate () -> bool {
 	return true;
 }
 
-pub fn whoami () -> String {
+pub fn whoami () -> enums::Outcome<String> {
 	let session = session_service::get_current_session();
 	
-	let owner = session.get_owner();
+	let owner = String::from(session.get_owner());
 	
-	return String::from(owner);
+	return enums::Outcome::Success(owner);
 }
 
 

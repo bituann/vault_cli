@@ -46,7 +46,7 @@ pub fn check_command (command_str: &String) -> enums::Check<Vec<&str>> {
 	
 	//only defined commands are accepted
 	let mut def_cmd = false;
-	for cmd in vec!["upload", "list", "read", "delete", "metadata", "register", "login", "logout"] {
+	for cmd in vec!["upload", "list", "read", "delete", "metadata", "register", "login", "logout", "whoami"] {
 		if command == cmd {
 			def_cmd = true;
 			break;
@@ -61,7 +61,7 @@ pub fn check_command (command_str: &String) -> enums::Check<Vec<&str>> {
 	let mut cmd_with_arg = true;
 	
 	//these commands must have no arguments except help
-	for cmd in vec!["list", "register", "login", "logout"] {
+	for cmd in vec!["list", "register", "login", "logout", "whoami"] {
 		//unset flag for commands with argument
 		if command == cmd {
 			cmd_with_arg = false;
