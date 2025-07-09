@@ -2,6 +2,7 @@ use std::io::{Read, Write};
 use std::hash::{DefaultHasher, Hash, Hasher};
 use std::fs;
 use crate::utils::enums;
+use crate::services::session_service;
 use serde::{Serialize, Deserialize};
 use serde_json::Result;
 use uuid::Uuid;
@@ -40,8 +41,6 @@ pub fn register (email: String, password: String) -> enums::Outcome<String> {
 }
 
 pub fn login (email: &String, password: &String) -> enums::Outcome<String> {
-	let session_token;
-	
 	//get user struct
 	let mut user: User;
 	
@@ -61,9 +60,15 @@ pub fn login (email: &String, password: &String) -> enums::Outcome<String> {
 	
 	
 	if user.password == password {
-		session_token = Uuid::new_v4().to_string();
-		fs::File::create("./src/storage/.vault-session").unwrap().write(session_token.as_bytes());
-		return enums::Outcome::Success(session_token);
+		let mut msg;
+		
+		if !session_service::create_session(user.email) {
+			msg = String::from("Unable to login. Try again");
+			return enums::Outcome::Fail(msg);
+		}
+		
+		msg = String::from("Login successful");
+		return enums::Outcome::Success(msg);
 	} else {
 		let msg = String::from("Incorrect password");
 		return enums::Outcome::Fail(msg);
@@ -71,15 +76,9 @@ pub fn login (email: &String, password: &String) -> enums::Outcome<String> {
 }
 
 pub fn logout () -> enums::Outcome<String> {
-	let path = "./src/storage/.vault-session";
-	let session;
-	
-	match fs::File::create(path) {
-		Ok(file) => session = file,
-		Err(_) => {
-			let msg = String::from("Error logging out. Try exiting the application");
-			return enums::Outcome::Fail(msg);
-		}
+	if !session_service::delete_session() {
+		let msg = String::from("Error logging out. Try exiting the application");
+		return enums::Outcome::Fail(msg);
 	}
 	
 	let msg = String::from("Logged out successfully");
@@ -94,13 +93,21 @@ pub fn check_user (email: &String) -> bool {
 }
 
 pub fn authenticate () -> bool {
-	let path = "./src/storage/.vault-session";
+	let session = session_service::get_current_session();
 	
-	if fs::metadata(path).unwrap().len() == 0 {
+	if session.get_id() == "" {
 		return false;
 	}
 	
 	return true;
+}
+
+pub fn whoami () -> String {
+	let session = session_service::get_current_session();
+	
+	let owner = session.get_owner();
+	
+	return String::from(owner);
 }
 
 

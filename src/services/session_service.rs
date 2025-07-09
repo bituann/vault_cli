@@ -7,7 +7,17 @@ use uuid::Uuid;
 #[derive(Serialize, Deserialize)]
 pub struct Session {
 	id: String,
-	email: String,
+	owner: String,
+}
+
+impl Session {
+	pub fn get_id(&self) -> &str {
+		return &self.id;
+	}
+	
+	pub fn get_owner(&self) -> &str {
+		return &self.owner;
+	}
 }
 
 const session_path: &str = "./src/storage/.vault-session";
@@ -15,7 +25,7 @@ const session_path: &str = "./src/storage/.vault-session";
 pub fn create_session (email: String) -> bool {
 	let session = Session {
 		id: Uuid::new_v4().to_string(),
-		email,
+		owner: email,
 	};
 	
 	let session_json = serde_json::to_string(&session).unwrap();
@@ -33,8 +43,25 @@ pub fn create_session (email: String) -> bool {
 }
 
 pub fn get_current_session () -> Session {
-	let session_file = fs::File::open(session_path).unwrap();
-	let session: Session = serde_json::from_reader(session_file).unwrap();
+	let mut session_file;
+	
+	match fs::File::open(session_path) {
+		Ok(file) => session_file = file,
+		Err(_) => return Session { 
+			id: String::from(""), 
+			owner: String::from(""),
+		},
+	}
+	
+	let mut session: Session;
+	
+	match serde_json::from_reader(session_file) {
+		Ok(from) => session = from,
+		Err(_) => return Session {
+			id: String::from(""),
+			owner: String::from(""),
+		},
+	}
 	
 	return session;
 }
