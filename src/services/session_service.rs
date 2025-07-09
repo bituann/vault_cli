@@ -20,8 +20,6 @@ pub fn create_session (email: String) -> bool {
 	
 	let session_json = serde_json::to_string(&session).unwrap();
 	
-	// let session_path = "./src/storage/.vault-session"
-	
 	let mut session_file;
 	
 	match fs::File::create(session_path) {
