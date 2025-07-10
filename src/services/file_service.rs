@@ -18,16 +18,7 @@ pub struct File {
 pub fn upload (file_path: &String, user_id: &String) -> enums::Outcome<String> {
 	let file_name = helper::get_file_name(file_path);
 	
-	let mut file_name_tokens: Vec<&str> = file_name.split(".").collect();
-	let file_extension = file_name_tokens.pop().unwrap();
-	
-	let mut new_file_name = String::new();
-	
-	for word in file_name_tokens {
-		new_file_name = format!("{}{}", new_file_name, word);
-	}
-	
-	new_file_name = format!("{}##{}.{}", new_file_name, user_id, file_extension);
+	let new_file_name = create_file_name(&file_name.to_string(), user_id);
 	
 	let destination = format!("./src/storage/uploads/{}", new_file_name);
 	
@@ -115,9 +106,11 @@ pub fn delete (file_name: &String, user_id: &String) -> enums::Outcome<String> {
 	match json_to_vec(path) {
 		enums::Outcome::Success(received) => files = received,
 		enums::Outcome::Fail(msg) => return enums::Outcome::Fail(msg)
-	};
+	}
 	
-	let file_path = format!("./src/storage/uploads/{}##{}", file_name, user_id);
+	let new_file_name = create_file_name(&file_name.to_string(), user_id);
+	
+	let file_path = format!("./src/storage/uploads/{}", new_file_name);
 	
 	//remove file from file system
 	match fs::remove_file(file_path) {
@@ -257,4 +250,19 @@ fn update_metadata_json (files: Vec<File>, path: &str) -> enums::Outcome<()> {
 	metadata.write(json_string.as_bytes());
 	
 	return enums::Outcome::Success(());
+}
+
+fn create_file_name (file_name: &String, id: &String) -> String {
+	let mut file_name_tokens: Vec<&str> = file_name.split(".").collect();
+	let file_extension = file_name_tokens.pop().unwrap();
+	
+	let mut new_file_name = String::new();
+	
+	for word in file_name_tokens {
+		new_file_name = format!("{}{}", new_file_name, word);
+	}
+	
+	new_file_name = format!("{}##{}.{}", new_file_name, id, file_extension);
+	
+	return new_file_name;
 }
