@@ -25,10 +25,17 @@ impl Command for Upload {
 		}
 		
 		//check if file exists
-		if file_service::file_exists(&file_name) {
-			println!("yayyyy");
-			let msg = String::from("File already exists. Select a different file or rename the file");
-			return enums::Outcome::Fail(msg);
+		match file_service::metadata(&file_name) {
+			enums::Outcome::Success(files) => {
+				let existing_files = files;
+				for file in existing_files {
+					if file.user_id == self.user {
+						let msg = String::from("File already exists. Select a different file or rename the file");
+						return enums::Outcome::Fail(msg);
+					}
+				}
+			}
+			enums::Outcome::Fail(_) => (),
 		}
 		
 		//exclude certain file extensions

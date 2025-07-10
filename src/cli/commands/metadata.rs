@@ -38,8 +38,13 @@ impl Command for Metadata {
 		
 		files.retain(|file| file.user_id == self.user);
 		
-		let metadata = format!("{:#?}", files[0]);
-		return enums::Outcome::Success(metadata);
+		if files.len() > 0 {
+			let metadata = format!("{:#?}", files[0]);
+			return enums::Outcome::Success(metadata);
+		}
+		
+		let msg = String::from("Unable to read metadata. Please check that the file name is correct");
+		return enums::Outcome::Fail(msg);
 	}
 	
 	fn help (&self) -> String {
