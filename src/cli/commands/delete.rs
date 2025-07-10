@@ -4,6 +4,7 @@ use crate::services::*;
 
 pub struct Delete {
 	file_name: String,
+	user: String,
 }
 
 impl Command for Delete {
@@ -28,7 +29,7 @@ impl Command for Delete {
 		}
 		
 		/*================ EXECUTION =================*/
-		return file_service::delete(&self.file_name);
+		return file_service::delete(&self.file_name, &self.user);
 	}
 	
 	fn help (&self) -> String {
@@ -47,8 +48,11 @@ impl Delete {
 		let file_path = String::from(file_path);
 		let file_name = helper::get_file_name(&file_path);
 		
+		let session = session_service::get_current_session();
+		
 		Self {
 			file_name: String::from(file_name),
+			user: session.owner,
 		}
 	}
 }
