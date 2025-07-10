@@ -8,10 +8,10 @@ use uuid::Uuid;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct File {
 	pub file_id: String,
-	user_id: String,
+	pub user_id: String,
 	pub file_name: String,
 	pub file_size: String,
-	file_path: String,
+	pub file_path: String,
 	//date_created: String
 }
 
@@ -133,25 +133,27 @@ pub fn delete (file_name: &String) -> enums::Outcome<String> {
 	}
 }
 
-pub fn metadata (file_name: &String) -> enums::Outcome<String> {
+pub fn metadata (file_name: &String) -> enums::Outcome<Vec<File>> {
 	let metadata_path = "./src/storage/metadata.json";
-	let mut files: Vec<File>;
+	let mut files: Vec<File> = vec![];
 	
 	//read json file to 'files'
 	match json_to_vec(metadata_path) {
-		enums::Outcome::Success(received) => files = received,
+		enums::Outcome::Success(received) => {
+			for file in received {
+				if file.file_name == *file_name {
+					files.push(file);
+				}
+			}
+		}
 		enums::Outcome::Fail(msg) => {
 			let msg = String::from("Cannot read metadata. Ensure the file name is correct. You can use the list command to see the list of files");
 			return enums::Outcome::Fail(msg);
 		}
 	}
 	
-	//check for file and provide string representation
-	for file in files {
-		if file.file_name == *file_name {
-			let metadata_str = String::from(format!("{:#?}", file));
-			return enums::Outcome::Success(metadata_str);
-		}
+	if files.len() > 0 {
+		return enums::Outcome::Success(files);
 	}
 	
 	//if execution gets to this point, it has failed

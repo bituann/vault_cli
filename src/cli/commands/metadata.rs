@@ -4,6 +4,7 @@ use crate::services::*;
 
 pub struct Metadata {
 	file_name: String,
+	user: String
 }
 
 impl Command for Metadata {
@@ -28,7 +29,17 @@ impl Command for Metadata {
 		}
 		
 		/*================ EXECUTION =================*/
-		return file_service::metadata(&self.file_name);
+		let mut files;
+		
+		match file_service::metadata(&self.file_name) {
+			enums::Outcome::Success(data) => files = data,
+			enums::Outcome::Fail(msg) => return enums::Outcome::Fail(msg)
+		}
+		
+		files.retain(|file| file.user_id == self.user);
+		
+		let metadata = format!("{:#?}", files[0]);
+		return enums::Outcome::Success(metadata);
 	}
 	
 	fn help (&self) -> String {
@@ -47,8 +58,11 @@ impl Metadata {
 		let file_path = String::from(file_path);
 		let file_name = helper::get_file_name(&file_path);
 		
+		let session = session_service::get_current_session();
+		
 		Self {
 			file_name: String::from(file_name),
+			user: session.owner,
 		}
 	}
 }

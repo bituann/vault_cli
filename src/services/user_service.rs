@@ -95,7 +95,7 @@ pub fn check_user (email: &String) -> bool {
 pub fn authenticate () -> bool {
 	let session = session_service::get_current_session();
 	
-	if session.get_id() == "" {
+	if session.id == "" {
 		return false;
 	}
 	
@@ -105,7 +105,7 @@ pub fn authenticate () -> bool {
 pub fn whoami () -> enums::Outcome<String> {
 	let session = session_service::get_current_session();
 	
-	let owner = String::from(session.get_owner());
+	let owner = String::from(session.owner);
 	
 	return enums::Outcome::Success(owner);
 }
