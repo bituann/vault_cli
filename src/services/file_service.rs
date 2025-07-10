@@ -6,14 +6,16 @@ use serde_json::Result;
 use uuid::Uuid;
 
 #[derive(Serialize, Deserialize, Debug)]
-struct File {
-	file_id: String,
-	file_name: String,
-	file_size: String,
+pub struct File {
+	pub file_id: String,
+	user_id: String,
+	pub file_name: String,
+	pub file_size: String,
+	file_path: String,
 	//date_created: String
 }
 
-pub fn upload (file_path: &String) -> enums::Outcome<String> {
+pub fn upload (file_path: &String, user_id: &String) -> enums::Outcome<String> {
 	let file_name = helper::get_file_name(file_path);
 	
 	let destination = format!("./src/storage/uploads/{}", file_name);
@@ -36,8 +38,10 @@ pub fn upload (file_path: &String) -> enums::Outcome<String> {
 	
 	let file = File {
 		file_id: Uuid::new_v4().to_string(),
+		user_id: user_id.to_string(),
 		file_name: String::from(file_name),
 		file_size: file_size.to_string(),
+		file_path: String::from(destination)
 		//date_created: String::from("{date_created:?}"),
 	};
 	
@@ -82,26 +86,14 @@ pub fn read (file_name: &String) -> enums::Outcome<String> {
 	return enums::Outcome::Success(content);
 }
 
-pub fn list () -> enums::Outcome<String> {
+pub fn list () -> enums::Outcome<Vec<File>> {
 	let path = "./src/storage/metadata.json";
-	let mut files: Vec<File>;
 	
 	//read json entries into 'files'
 	match json_to_vec(path) {
-		enums::Outcome::Success(received) => files = received,
+		enums::Outcome::Success(files) => return enums::Outcome::Success(files),
 		enums::Outcome::Fail(msg) => return enums::Outcome::Fail(msg)
-	};
-	
-	//create file list starting with header
-	let mut file_list = format!("{:15} | {:40} | {:10}\n", "id", "name", "size");
-	
-	for file in files {
-		//add each file to file list
-		file_list = format!("{}{:15} | {:40} | {:10}\n", file_list, file.file_id, file.file_name, file.file_size);
 	}
-	
-	let file_list = String::from(file_list);
-	return enums::Outcome::Success(file_list);
 }
 
 pub fn delete (file_name: &String) -> enums::Outcome<String> {

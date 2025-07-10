@@ -6,18 +6,8 @@ use uuid::Uuid;
 
 #[derive(Serialize, Deserialize)]
 pub struct Session {
-	id: String,
-	owner: String,
-}
-
-impl Session {
-	pub fn get_id(&self) -> &str {
-		return &self.id;
-	}
-	
-	pub fn get_owner(&self) -> &str {
-		return &self.owner;
-	}
+	pub id: String,
+	pub owner: String,
 }
 
 const session_path: &str = "./src/storage/.vault-session";

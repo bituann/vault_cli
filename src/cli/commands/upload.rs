@@ -4,6 +4,7 @@ use crate::services::*;
 
 pub struct Upload {
 	file_path: String,
+	user: String,
 }
 
 impl Command for Upload {
@@ -42,7 +43,7 @@ impl Command for Upload {
 		}
 		
 		/*================ EXECUTION =================*/
-		return file_service::upload(&self.file_path);
+		return file_service::upload(&self.file_path, &self.user);
 	}
 	
 	fn help (&self) -> String {
@@ -59,8 +60,10 @@ impl Command for Upload {
 
 impl Upload {
 	pub fn new(file_path: &str) -> Self {
+		let session = session_service::get_current_session();
 		Self {
 			file_path: String::from(file_path),
+			user: session.owner,
 		}
 	}
 }
