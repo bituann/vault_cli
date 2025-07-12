@@ -3,6 +3,7 @@ use std::fs;
 use serde::{Serialize, Deserialize};
 use serde_json::Result;
 use uuid::Uuid;
+use redis::{Connection, TypedCommands, HashFieldExpirationOptions, SetExpiry};
 
 #[derive(Serialize, Deserialize)]
 pub struct Session {
@@ -18,47 +19,45 @@ pub fn create_session (email: String) -> bool {
 		owner: email,
 	};
 	
-	let session_json = serde_json::to_string(&session).unwrap();
+	let mut con = get_redis_connection();
 	
-	let mut session_file;
-	
-	match fs::File::create(session_path) {
-		Ok(file) => session_file = file,
-		Err(_) => return false,
-	}
-	
-	session_file.write(session_json.as_bytes());
+	con.set_ex("session_id", session.id , 60);
+	con.set_ex("session_owner", session.owner, 60);
 	
 	return true;
 }
 
 pub fn get_current_session () -> Session {
-	let mut session_file;
+	let mut con = get_redis_connection();
 	
-	match fs::File::open(session_path) {
-		Ok(file) => session_file = file,
-		Err(_) => return Session { 
-			id: String::from(""), 
-			owner: String::from(""),
+	let session = Session {
+		id: match con.get("session_id").unwrap() {
+			Some(val) => val,
+			None => String::from("")
 		},
-	}
-	
-	let mut session: Session;
-	
-	match serde_json::from_reader(session_file) {
-		Ok(from) => session = from,
-		Err(_) => return Session {
-			id: String::from(""),
-			owner: String::from(""),
-		},
-	}
+		owner: match con.get("session_owner").unwrap() {
+			Some(val) => val,
+			None => String::from("")
+		}
+	};
 	
 	return session;
 }
 
 pub fn delete_session () -> bool {
-	match fs::File::create(session_path) {
+	let mut con = get_redis_connection();
+	
+	match con.del(&["session_id", "session_owner"]) {
 		Ok(_) => return true,
-		Err(_) => return false,
+		Err(_) => return false
 	}
+}
+
+
+
+
+fn get_redis_connection () -> redis::Connection {
+	let client = redis::Client::open("redis://127.0.0.1").unwrap();
+	
+	return client.get_connection().unwrap();
 }
