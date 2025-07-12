@@ -72,9 +72,11 @@ pub fn upload (file_path: &String, user_id: &String) -> enums::Outcome<String> {
 	}
 }
 
-pub fn read (file_name: &String) -> enums::Outcome<String> {
+pub fn read (file_name: &String, user_id: &String) -> enums::Outcome<String> {
+	let new_file_name = create_file_name(file_name, user_id);
+	
 	//create path from file name
-	let file_path = format!("./src/storage/uploads/{}", file_name);
+	let file_path = format!("./src/storage/uploads/{}", new_file_name);
 	
 	//get file content as string
 	let content = match fs::read_to_string(&file_path) {
